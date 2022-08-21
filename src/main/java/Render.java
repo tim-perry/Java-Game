@@ -17,7 +17,7 @@ public class Render {
     private static Shader shader;
 
     public Render() {
-        Render.shader = new Shader("vertexshader.glsl", "fragshader.glsl");
+        Render.shader = new Shader("assets/vertexshader.glsl", "assets/fragshader.glsl");
     }
 
     static void render() {
