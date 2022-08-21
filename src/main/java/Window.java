@@ -1,5 +1,7 @@
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL;
+
+import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import static org.lwjgl.glfw.GLFW.*;
 import static org.lwjgl.opengl.GL11C.*;
 import static org.lwjgl.system.MemoryUtil.NULL;
@@ -13,9 +15,9 @@ public class Window {
     private static Window window = null;
 
     private Window() {
-        this.width = 1920;
-        this.height = 1080;
-        this.title = "Window Title";
+        this.width = 1000;
+        this.height = 1000;
+        this.title = "The Game";
     }
 
     static public Window get() {
@@ -25,32 +27,44 @@ public class Window {
         return Window.window;
     }
 
-    public void run() {
-        if (!glfwInit()) {
-            throw new IllegalStateException("Unable to initialize GLFW");
+    private void loop() {
+        while(!glfwWindowShouldClose(glfwWindow)) {
+            GLFW.glfwPollEvents();
+            glClear(GL_COLOR_BUFFER_BIT);
+
+            Render.render();
+
+            glfwSwapBuffers(glfwWindow);
         }
+    }
+
+    public void run() {
         //Create window
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-        glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
         glfwWindow = GLFW.glfwCreateWindow(this.width, this.height, this.title, NULL, NULL);
+        if (glfwWindow == NULL) {
+            throw new RuntimeException("Failed to create window");
+        }
 
-        //setup
+        //Window Position
+        GLFWVidMode vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+        glfwSetWindowPos(glfwWindow, vidMode.width() - this.width, 0);
+
+        //Initialization
         glfwMakeContextCurrent(glfwWindow);
         glfwSwapInterval(1);
         glfwShowWindow(glfwWindow);
         GL.createCapabilities();
+        glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+        glViewport(0,0, this.width, this.height);
+        new Render();
 
+        loop();
 
-
-        while(!glfwWindowShouldClose(glfwWindow)) {
-            GLFW.glfwPollEvents();
-
-            glClearColor(1.0f, 0.0f, 0.0f, 1.0f);
-            glClear(GL_COLOR_BUFFER_BIT);
-
-            glfwSwapBuffers(glfwWindow);
-        }
+        //Destroy window
+        glfwFreeCallbacks(glfwWindow);
+        glfwDestroyWindow(glfwWindow);
     }
 }
