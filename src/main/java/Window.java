@@ -32,7 +32,7 @@ public class Window {
             GLFW.glfwPollEvents();
             glClear(GL_COLOR_BUFFER_BIT);
 
-            Render.render();
+            Renderer.render();
 
             glfwSwapBuffers(glfwWindow);
         }
@@ -57,9 +57,9 @@ public class Window {
         glfwSwapInterval(1);
         glfwShowWindow(glfwWindow);
         GL.createCapabilities();
-        glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+        glClearColor(0f, 0f, 0f, 1.0f);
         glViewport(0,0, this.width, this.height);
-        new Render();
+        Renderer.setup();
 
         loop();
 
