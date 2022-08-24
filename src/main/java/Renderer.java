@@ -24,10 +24,48 @@ public class Renderer {
         int VAO = glGenVertexArrays();
         glBindVertexArray(VAO);
 
-        float[] vertices = {        //texture coordinates
-                -0.8f, -0.4f, 0.0f, 0.0f, 0.0f,
-                0.0f, 0.4f, 0.0f,   0.5f, 1.0f,
-                0.8f, -0.4f, 0.0f,  1.0f, 0.0f
+        float vertices[] = {
+                -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+                0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+                0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+                0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+                -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+                -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+                -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+                0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+                0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+                0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+                -0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+                -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+                -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+                -0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+                -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+                -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+                -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+                -0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+                0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+                0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+                0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+                0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+                0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+                0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+                -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+                0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+                0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+                0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+                -0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+                -0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+                -0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+                0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+                0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+                0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+                -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+                -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
         };
 
         VBO = memAllocFloat(vertices.length); //needs to be freed?
@@ -66,25 +104,45 @@ public class Renderer {
         int texloc = glGetUniformLocation(Renderer.shader.id, "thetexture");
         glUniform1i(texloc, 0);
 
-
+        //enable
+        glEnable(GL_DEPTH_TEST);
     }
     public static void render() {
         Renderer.shader.use();
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         float time = (float)GLFW.glfwGetTime();
         float value = ((float)Math.sin(5 * time) + 1) /2;
 
         float[] color = {0.0f, value, 0.0f, 1.0f};
-        FloatBuffer fb = memAllocFloat(16);
-        Matrix4f matrix = new Matrix4f();
-        matrix.rotate(3 * time, 0f, 0f, 1f);
-        matrix.translate(0,value - 0.5f,0);
-        matrix.get(fb);
+
+        Matrix4f model = new Matrix4f();
+        model.rotate(time, 0f, 0f, 1f);
+        model.rotate(time, 1f, 0, 0);
+        model.rotate(time, 0f, 1f, 0);
+        model.translate(0,value - 0.5f,0f);
+        FloatBuffer mb = memAllocFloat(16);
+        model.get(mb);
+
+        Matrix4f view = new Matrix4f();
+        view.translate(0,0, -10f);
+        FloatBuffer vb = memAllocFloat(16);
+        view.get(vb);
+
+        Matrix4f proj = new Matrix4f();
+        proj.perspective(0.25f, 1, 0.1f, 100f);
+        FloatBuffer pb = memAllocFloat(16);
+        proj.get(pb);
 
         int color_loc = glGetUniformLocation(shader.id, "triangleColor");
-        int transform_loc = glGetUniformLocation(shader.id, "transform");
+        int model_loc = glGetUniformLocation(shader.id, "model");
+        int view_loc = glGetUniformLocation(shader.id, "view");
+        int proj_loc = glGetUniformLocation(shader.id, "proj");
+
         glUniform4fv(color_loc, color);
-        glUniformMatrix4fv(transform_loc, false, fb);
-        glDrawArrays(GL_TRIANGLES, 0, 3);
+        glUniformMatrix4fv(model_loc, false, mb);
+        glUniformMatrix4fv(view_loc, false, vb);
+        glUniformMatrix4fv(proj_loc, false, pb);
+        glDrawArrays(GL_TRIANGLES, 0, 36);
     }
 }
