@@ -1,3 +1,5 @@
+package Engine;
+
 import org.lwjgl.*;
 import static org.lwjgl.opengl.GL20C.*;
 import java.io.File;
@@ -5,7 +7,7 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 
 public class Shader {
-    public int id;
+    private int id;
 
     public Shader(String vs_source, String fs_source) {
             String source;
@@ -51,5 +53,9 @@ public class Shader {
 
     public void use() {
         glUseProgram(this.id);
+    }
+
+    public int getId() {
+        return this.id;
     }
 }

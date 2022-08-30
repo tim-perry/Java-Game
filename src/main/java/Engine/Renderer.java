@@ -1,5 +1,8 @@
+package Engine;
+
 import org.joml.*;
 import org.lwjgl.glfw.GLFW;
+import org.lwjgl.opengl.GL20C;
 import org.lwjgl.stb.STBImage;
 import org.lwjgl.system.MemoryStack;
 
@@ -101,21 +104,24 @@ public class Renderer {
             STBImage.stbi_image_free(data);
         }
         Renderer.shader.use();
-        int texloc = glGetUniformLocation(Renderer.shader.id, "thetexture");
+        int texloc = GL20C.glGetUniformLocation(Renderer.shader.getId(), "thetexture");
         glUniform1i(texloc, 0);
 
-        //enable
+        //options
         glEnable(GL_DEPTH_TEST);
+        glClearColor(0f, 0f, 0f, 1.0f);
     }
-    public static void render() {
+    public static void render(Camera camera) {
         Renderer.shader.use();
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         float time = (float)GLFW.glfwGetTime();
         float value = ((float)Math.sin(5 * time) + 1) /2;
 
         float[] color = {0.0f, value, 0.0f, 1.0f};
+        int color_loc = GL20C.glGetUniformLocation(shader.getId(), "triangleColor");
+        glUniform4fv(color_loc, color);
 
+        //model matrix
         Matrix4f model = new Matrix4f();
         model.rotate(time, 0f, 0f, 1f);
         model.rotate(time, 1f, 0, 0);
@@ -123,26 +129,25 @@ public class Renderer {
         model.translate(0,value - 0.5f,0f);
         FloatBuffer mb = memAllocFloat(16);
         model.get(mb);
+        int model_loc = GL20C.glGetUniformLocation(shader.getId(), "model");
+        glUniformMatrix4fv(model_loc, false, mb);
 
-        Matrix4f view = new Matrix4f();
-        view.translate(0,0, -10f);
+        //view matrix
+        Matrix4f view = camera.getViewMatrix();
         FloatBuffer vb = memAllocFloat(16);
         view.get(vb);
+        int view_loc = GL20C.glGetUniformLocation(shader.getId(), "view");
+        glUniformMatrix4fv(view_loc, false, vb);
 
-        Matrix4f proj = new Matrix4f();
-        proj.perspective(0.25f, 1, 0.1f, 100f);
+        //projection matrix
+        Matrix4f proj = camera.getProjMatrix();
         FloatBuffer pb = memAllocFloat(16);
         proj.get(pb);
-
-        int color_loc = glGetUniformLocation(shader.id, "triangleColor");
-        int model_loc = glGetUniformLocation(shader.id, "model");
-        int view_loc = glGetUniformLocation(shader.id, "view");
-        int proj_loc = glGetUniformLocation(shader.id, "proj");
-
-        glUniform4fv(color_loc, color);
-        glUniformMatrix4fv(model_loc, false, mb);
-        glUniformMatrix4fv(view_loc, false, vb);
+        int proj_loc = GL20C.glGetUniformLocation(shader.getId(), "proj");
         glUniformMatrix4fv(proj_loc, false, pb);
+
+        //Clear and render
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glDrawArrays(GL_TRIANGLES, 0, 36);
     }
 }

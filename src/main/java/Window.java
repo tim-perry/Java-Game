@@ -1,3 +1,4 @@
+import Engine.Renderer;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL;
 
@@ -27,17 +28,6 @@ public class Window {
         return Window.window;
     }
 
-    private void loop() {
-        while(!glfwWindowShouldClose(glfwWindow)) {
-            GLFW.glfwPollEvents();
-            glClear(GL_COLOR_BUFFER_BIT);
-
-            Renderer.render();
-
-            glfwSwapBuffers(glfwWindow);
-        }
-    }
-
     public void run() {
         //Create window
         glfwDefaultWindowHints();
@@ -50,18 +40,25 @@ public class Window {
 
         //Window Position
         GLFWVidMode vidMode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-        glfwSetWindowPos(glfwWindow, vidMode.width() - this.width, 0);
+        glfwSetWindowPos(glfwWindow, vidMode.width() - this.width, 100);
 
         //Initialization
         glfwMakeContextCurrent(glfwWindow);
-        glfwSwapInterval(1);
+        glfwSwapInterval(0);
         glfwShowWindow(glfwWindow);
         GL.createCapabilities();
-        glClearColor(0f, 0f, 0f, 1.0f);
         glViewport(0,0, this.width, this.height);
-        Renderer.setup();
 
-        loop();
+        Renderer.setup();
+        Game game = new Game(glfwWindow);
+
+        //loop
+        while(!glfwWindowShouldClose(glfwWindow)) {
+            GLFW.glfwPollEvents();
+            game.gameloop();
+            Renderer.render(game.camera);
+            glfwSwapBuffers(glfwWindow);
+        }
 
         //Destroy window
         glfwFreeCallbacks(glfwWindow);
