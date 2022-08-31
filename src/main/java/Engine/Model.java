@@ -14,10 +14,10 @@ import static org.lwjgl.opengl.GL20C.glEnableVertexAttribArray;
 import static org.lwjgl.opengl.GL20C.glVertexAttribPointer;
 import static org.lwjgl.opengl.GL30C.*;
 import static org.lwjgl.system.MemoryStack.stackPush;
-import static org.lwjgl.system.MemoryUtil.memAddress;
-import static org.lwjgl.system.MemoryUtil.memAllocFloat;
+import static org.lwjgl.system.MemoryUtil.*;
 
 
+//TODO: Rework this class
 /*
 A model is a VAO context, with an associated VBO, vertex attribute pointers, and texture.
 
@@ -31,14 +31,16 @@ public class Model {
     private int textureID;
     private int VAO_id;
     private int VBO_id;
+    private int triangleCount;
 
     public int getVAO_id() {
         return VAO_id;
     }
-
     public int getTextureID() {
         return textureID;
     }
+    public int getTriangleCount() {return triangleCount;}
+
 
     public Model() {
         //Create and bind VAO and VBO
@@ -48,6 +50,7 @@ public class Model {
         glBindBuffer(GL_ARRAY_BUFFER, VBO_id);
 
         //Load vertices
+        triangleCount = 36;
         float vertices[] = {
                 -0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
                 0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
@@ -91,9 +94,10 @@ public class Model {
                 -0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
                 -0.5f,  0.5f, -0.5f,  0.0f, 1.0f
         };
-        FloatBuffer vertexBuffer = memAllocFloat(vertices.length); //needs to be freed?
+        FloatBuffer vertexBuffer = memAllocFloat(vertices.length);
         vertexBuffer.put(vertices).flip();
         glBufferData(GL_ARRAY_BUFFER, vertexBuffer, GL_STATIC_DRAW);
+        memFree(vertexBuffer);
 
         //Setup vertex attribute pointers
         glVertexAttribPointer(0, 3, GL_FLOAT, false, 5*4, 0);

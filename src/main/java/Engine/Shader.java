@@ -1,13 +1,21 @@
 package Engine;
 
-import org.lwjgl.*;
 import static org.lwjgl.opengl.GL20C.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 
+//TODO: Add error checking for shader compilation
 public class Shader {
     private int id;
+
+    public void use() {
+        glUseProgram(this.id);
+    }
+    public void unbind() {glUseProgram(0);}
+    public int getId() {
+        return this.id;
+    }
 
     public Shader(String vs_source, String fs_source) {
             String source;
@@ -49,13 +57,5 @@ public class Shader {
             glLinkProgram(this.id);
             glDeleteShader(vs_id);
             glDeleteShader(fs_id);
-    }
-
-    public void use() {
-        glUseProgram(this.id);
-    }
-
-    public int getId() {
-        return this.id;
     }
 }

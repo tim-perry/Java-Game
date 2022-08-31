@@ -1,3 +1,5 @@
+package Game;
+
 import Engine.Model;
 import org.joml.Matrix4f;
 
@@ -30,20 +32,13 @@ public class Entity {
         this.scale = scale;
     }
 
-
     public Matrix4f getMatrix() {
         Matrix4f matrix = new Matrix4f();
-        //translate
         matrix.translate(posX, posY, posZ);
-
-        //rotate order matters !??!
-        matrix.rotate(rotZ, 0f, 0f, 1f);
         matrix.rotate(rotX, 1f, 0, 0);
         matrix.rotate(rotY, 0f, 1f, 0);
-
-        //scale
+        matrix.rotate(rotZ, 0f, 0f, 1f);
         matrix.scale(scale);
-
         return matrix;
     }
 }
