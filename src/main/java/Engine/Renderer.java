@@ -37,9 +37,9 @@ public class Renderer {
         float time = (float)GLFW.glfwGetTime();
         float value = ((float)Math.sin(5 * time) + 1) /2;
 
-        float[] color = {0.0f, value, 0.0f, 1.0f};
+        float[] color = {0.0f, value, 0.0f, value};
         int color_loc = GL20C.glGetUniformLocation(shader.getId(), "triangleColor");
-        glUniform4fv(color_loc, color);
+        //glUniform4fv(color_loc, color);
 
         //model matrix
         FloatBuffer mb = memAllocFloat(16);

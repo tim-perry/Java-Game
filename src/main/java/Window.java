@@ -18,8 +18,8 @@ public class Window {
     private static Window window = null;
 
     private Window() {
-        this.width = 1000;
-        this.height = 1000;
+        this.width = 1920;
+        this.height = 1080;
         this.title = "The Game";
     }
 
@@ -35,7 +35,7 @@ public class Window {
         glfwDefaultWindowHints();
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE);
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
-        glfwWindow = GLFW.glfwCreateWindow(this.width, this.height, this.title, NULL, NULL);
+        glfwWindow = GLFW.glfwCreateWindow(this.width, this.height, this.title, NULL, NULL); //fullscreen (set 4th argument to NULL for window)
         if (glfwWindow == NULL) {
             throw new RuntimeException("Failed to create window");
         }
@@ -50,6 +50,10 @@ public class Window {
         glfwShowWindow(glfwWindow);
         GL.createCapabilities();
         glViewport(0,0, this.width, this.height);
+
+        //input
+        //glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+        //glfwSetInputMode(glfwWindow, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 
         Renderer.setup();
         Game game = new Game(glfwWindow);

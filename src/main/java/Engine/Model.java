@@ -120,7 +120,7 @@ public class Model {
             IntBuffer channels = stack.callocInt(1);
             ByteBuffer data = STBImage.stbi_load(path, width, height, channels, 0);
             if (memAddress(data) == 0) System.out.println("Failed to load image");
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width.get(0), height.get(0), 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width.get(0), height.get(0), 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
             glGenerateMipmap(GL_TEXTURE_2D);
             STBImage.stbi_image_free(data);
         }

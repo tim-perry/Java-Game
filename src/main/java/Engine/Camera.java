@@ -21,7 +21,7 @@ public class Camera {
     }
 
     public Camera(Vector3f position, float aspect) {
-        this(position, new Vector3f(position).negate(), new Vector3f(0, 1, 0), 1f, 0.25f);
+        this(position, new Vector3f(position).negate(), new Vector3f(0, 1, 0), aspect, 0.50f);
     }
 
     public Matrix4f getViewMatrix() {
