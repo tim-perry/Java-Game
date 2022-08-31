@@ -1,4 +1,6 @@
+import Engine.Model;
 import Engine.Renderer;
+import org.joml.Matrix4f;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL;
 
@@ -56,7 +58,14 @@ public class Window {
         while(!glfwWindowShouldClose(glfwWindow)) {
             GLFW.glfwPollEvents();
             game.gameloop();
-            Renderer.render(game.camera);
+
+            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+            //for each entity in game.entityarray
+            for (Entity i :game.entities) {
+                Renderer.render(game.camera, i.model, i.getMatrix());
+            }
+
+
             glfwSwapBuffers(glfwWindow);
         }
 

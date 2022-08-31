@@ -2,35 +2,39 @@ package Engine;
 
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
+import org.joml.Vector3fc;
 
 public class Camera {
     private Vector3f position;
-    private float rot;
+    private Vector3f direction;
+    private Vector3f up;
+
     private float aspect;
     private float fov;
-    private boolean perspective;
 
-    public Camera(Vector3f position, float rot, float aspect, boolean perspective, float fov) {
+    public Camera(Vector3f position, Vector3f direction, Vector3f up, float aspect, float fov) {
         this.position = position;
-        this.rot = rot;
+        this.direction = direction;
+        this.up = up;
         this.aspect = aspect;
-        this.perspective = perspective;
         this.fov = fov;
     }
 
-    public Camera(Vector3f position, float rot, float aspect) {
-        this(position, rot, aspect, false, 0);
+    public Camera(Vector3f position, float aspect) {
+        this(position, new Vector3f(position).negate(), new Vector3f(0, 1, 0), 1f, 0.25f);
     }
 
     public Matrix4f getViewMatrix() {
         Matrix4f viewMatrix = new Matrix4f();
-        viewMatrix.translate(this.position).invert();
+        Vector3f centre = new Vector3f(position);
+        centre.add(direction);
+        viewMatrix.lookAt(position, centre, up);
+        //viewMatrix.translate(this.position).invert();
         return viewMatrix;
     }
 
     public Matrix4f getProjMatrix() {
         Matrix4f projMatrix = new Matrix4f();
-        if (this.perspective == false) return projMatrix; //tried to generate projection matrix for an orthographic camera
         projMatrix.perspective(this.fov, this.aspect, 0.1f, 500f);
         return projMatrix;
     }
@@ -45,15 +49,15 @@ public class Camera {
         this.fov = fov;
     }
 
-    public float getRot() {
-        return rot;
+    public void setPosition(Vector3f position) {
+        this.position = position;
     }
 
-    public void setRot(float rot) {
-        this.rot = rot;
+    public void setDirection(Vector3f direction) {
+        this.direction = direction;
     }
 
-    public boolean isPerspective() {
-        return perspective;
+    public Vector3f getPosition() {
+        return new Vector3f(position); //return new vector that can be changed without altering private attribute
     }
 }
