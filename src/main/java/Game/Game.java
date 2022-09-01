@@ -1,21 +1,20 @@
 package Game;
 
 import Engine.Camera;
+import Engine.Input;
+import Engine.Time;
+import Engine.Window;
 import org.joml.Vector3f;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
-
-import static org.lwjgl.glfw.GLFW.GLFW_PRESS;
 
 public class Game {
     public ArrayList<Entity> entities = new ArrayList<Entity>();
     public Camera camera;
     public long glfwWindow;
 
-    public Game(long glfwWindow) {
+    public Game() {
         this.camera = new Camera(new Vector3f(0, 0f, 20f), 16/9f);
-        this.glfwWindow = glfwWindow;
 
         //floating cubes
         entities.add(new Entity(-1, 0, -1, 1));
@@ -38,24 +37,53 @@ public class Game {
         //Containing cubes
         entities.add(new Entity(0, -10, 0, 100));
         entities.add(new Entity(0, -52, 0, 100));
+
+        //Camera cube
+        entities.add(new Entity(0, 0, 20f, 0.3f));
     }
 
     public void gameloop() {
-        if (GLFW.glfwGetKey(glfwWindow, GLFW.GLFW_KEY_ESCAPE) == GLFW_PRESS)
-            GLFW.glfwSetWindowShouldClose(glfwWindow, true);
+        if (Input.isPressed(Input.KEY_ESC))
+            Window.close();
 
+        entities.get(12).posX = 16 * (float)Math.cos(0.5 * Time.getTime());
+        entities.get(12).posY = 1.2f * (float)Math.cos(Time.getTime());
+        entities.get(12).posZ = 16 * (float)Math.sin(0.5 * Time.getTime());
 
-        float time = (float) GLFW.glfwGetTime();
-        float value = ((float)Math.sin(5 * time) + 1) /2;
+        if (Input.isPressed(Input.KEY_W)) {
+            Vector3f newpos = camera.getPosition().add(camera.getDirection().mul(Time.delta()));
+            camera.setPosition(newpos);
+        }
+        if (Input.isPressed(Input.KEY_S)) {
+            Vector3f newpos = camera.getPosition().add(camera.getDirection().negate().mul(Time.delta()));
+            camera.setPosition(newpos);
+        }
+        if (Input.isPressed(Input.KEY_D)) {
+            Vector3f newpos = camera.getPosition().add(camera.getDirection().cross(camera.getUp()).mul(Time.delta()));
+            camera.setPosition(newpos);
+        }
+        if (Input.isPressed(Input.KEY_A)) {
+            Vector3f newpos = camera.getPosition().add(camera.getDirection().cross(camera.getUp()).negate().mul(Time.delta()));
+            camera.setPosition(newpos);
+        }
+        if (Input.isPressed(Input.KEY_Q)) {
+            Vector3f newDir = camera.getDirection().rotateY(Time.delta() * 1.5f);
+            camera.setDirection(newDir);
+        }
+        if (Input.isPressed(Input.KEY_E)) {
+            Vector3f newDir = camera.getDirection().rotateY(-Time.delta() * 1.5f);
+            camera.setDirection(newDir);
+        }
 
-        camera.setPosition(new Vector3f(16 * (float)Math.cos(0.5 * time), 1.2f * (float)Math.cos(time), 16 * (float)Math.sin(0.5 * time)));
-        camera.setDirection(camera.getPosition().negate());
+        if (Input.isPressed(Input.KEY_SPACE)) {
+            camera.setPosition(new Vector3f(entities.get(12).posX, entities.get(12).posY, entities.get(12).posZ));
+        }
 
         for (int i = 0; i < 5; i++) {
-            entities.get(i).rotX = time;
-            entities.get(i).rotY = time;
-            entities.get(i).rotZ = time;
-            entities.get(i).posY = value - 0.5f;
+            entities.get(i).rotX += Time.delta();
+            entities.get(i).rotY += Time.delta();
+            entities.get(i).rotZ += Time.delta();
+            entities.get(i).posY = ((float)Math.sin(5 * Time.getTime()) + 1) /2 - 0.5f;
         }
     }
 }

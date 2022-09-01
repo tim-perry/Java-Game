@@ -18,6 +18,9 @@ public class Window {
     private String title;
     private boolean fullscreen;
 
+    public static void close() {
+        GLFW.glfwSetWindowShouldClose(window.glfwWindow, true);
+    }
 
     private Window() {
         //TODO: Read resolution and window/fullscreen from config file else use default and generate one
@@ -48,22 +51,24 @@ public class Window {
 
         //OpenGL Initialization
         glfwMakeContextCurrent(glfwWindow);
-        glfwSwapInterval(0);
+        glfwSwapInterval(1);
         glfwShowWindow(glfwWindow);
         GL.createCapabilities();
         glViewport(0,0, this.width, this.height);
 
         //input Initialization
+        Input.setGlfwWindow(glfwWindow);
         //glfwSetInputMode(glfwWindow, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         //glfwSetInputMode(glfwWindow, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 
         //Engine and game initialization
         Renderer.setup();
-        Game game = new Game(glfwWindow);
+        Game game = new Game();
 
         //Engine.Window loop
         while(!glfwWindowShouldClose(glfwWindow)) {
             GLFW.glfwPollEvents();
+            Time.update();
             game.gameloop();
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);

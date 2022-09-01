@@ -20,7 +20,7 @@ public class Camera {
     }
 
     public Camera(Vector3f position, float aspect) {
-        this(position, new Vector3f(position).negate(), new Vector3f(0, 1, 0), aspect, 0.50f);
+        this(position, new Vector3f(position).negate(), new Vector3f(0, 1, 0), aspect, 0.80f);
     }
 
     //Transform Matrices
@@ -34,7 +34,7 @@ public class Camera {
 
     public Matrix4f getProjMatrix() {
         Matrix4f projMatrix = new Matrix4f();
-        projMatrix.perspective(this.fov, this.aspect, 0.1f, 500f);
+        projMatrix.perspective(this.fov, this.aspect, 0.25f, 500f);
         return projMatrix;
     }
 
@@ -45,4 +45,6 @@ public class Camera {
     public void setPosition(Vector3f position) {this.position = position;}
     public Vector3f getDirection() {return new Vector3f(direction);}
     public void setDirection(Vector3f direction) {this.direction = direction;}
+    public Vector3f getUp() {return new Vector3f(up);}
+    public void setUp(Vector3f up) {this.up = up;}
 }
