@@ -1,9 +1,6 @@
-# Engine.Engine.Game
+# Java Game
+This is a basic Java game engine made using LWJGL  
 
-TODO LIST:
+# Todo
 
-Add error checking for shader program creation
-
-Make game :)
-
-Name game
+Add error checking for shader program creation  
